@@ -11,7 +11,7 @@ Question
 Hybrid Retrieval (pgvector cosine + tsvector BM25, fused by RRF)
    │
    ▼
-Cohere Reranker (relevance score per chunk)
+Jina Reranker v2 (relevance score per chunk)
    │
    ├── score ≥ 0.55  → CORRECT ──► Knowledge Refinement ──► Gemini (grounded answer)
    │                                                              │
@@ -45,7 +45,7 @@ Every decision is recorded in a trace that streams to the React inspector panel.
 | Control | Where |
 |---|---|
 | 1. Hybrid retrieval fuses two ranking signals | `retrieval.py` |
-| 2. Cross-encoder reranks every candidate | `jina.py` (Cohere reranker) |
+| 2. Cross-encoder reranks every candidate | `jina.py` (jina-reranker-v2-base-multilingual) |
 | 3. Max-score action trigger (not mean) | `crag/action.py` |
 | 4. Knowledge refinement strips irrelevant sentences | `crag/decompose.py` |
 | 5. Hard refusal below lower threshold | `crag/graph.py` |
@@ -66,7 +66,7 @@ The `incorrect` branch refuses outright — no web search, no hallucinated stand
 | `28552-k30.docx` | TS 28.552 | KPIs | 820 |
 | `data/raw/openapi/*.yaml` | All | OpenAPI schemas (7 files) | 101 |
 
-Total: 1185 sections → 1679 chunks @ 1024-dim Cohere embeddings.
+Total: 1185 sections → 1679 chunks @ 1024-dim Jina embeddings (jina-embeddings-v3).
 
 ## Local Setup
 
@@ -76,12 +76,12 @@ uv sync
 
 # 2. Create .env (see .env.example)
 cp .env.example .env
-# fill in COHERE_API_KEY, GEMINI_API_KEY, DB_URL
+# fill in JINA_API_KEY, GEMINI_API_KEY, DB_URL
 
 # 3. Apply schema to Neon
 psql "$DB_URL" -f schema.sql
 
-# 4. Ingest (takes ~10 minutes due to Cohere free-tier rate limits)
+# 4. Ingest (takes ~10 minutes due to Jina free-tier rate limits)
 uv run python -m threegpp_rag.ingest.run
 
 # 5. Run backend
@@ -103,5 +103,5 @@ uv run pytest -v
 - **Tier 1 corpus only**: 3 specs + 7 OpenAPI files. Drop more `.docx` into `data/raw/` and re-run ingestion.
 - **Single retry**: Ambiguous queries get one rewrite and one re-retrieval, then refuse. Fits Vercel's 60s limit.
 - **No conversation memory**: Each query is stateless.
-- **Cohere free tier**: Rate-limited to ~100 API calls/minute; production usage needs a paid plan.
+- **Jina free tier**: Rate-limited; the backoff handler retries up to 6 times. Production usage benefits from a paid plan.
 - **Sequential scan**: No HNSW index. Exact search is faster than index overhead at 1679 chunks; add one past ~50k rows.
