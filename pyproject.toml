@@ -1,0 +1,28 @@
+[project]
+name = "threegpp-rag"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "cohere>=7.0.8",
+    "fastapi>=0.141.1",
+    "firecrawl-anydoc>=0.1.8",
+    "google-genai>=2.18.0",
+    "httpx>=0.28.1",
+    "langchain-core>=1.5.4",
+    "langgraph>=1.2.11",
+    "psycopg[binary]>=3.3.4",
+    "python-dotenv>=1.2.2",
+    "pyyaml>=6.0.3",
+    "uvicorn[standard]>=0.52.2",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.1.1",
+    "pytest-asyncio>=1.4.0",
+]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
