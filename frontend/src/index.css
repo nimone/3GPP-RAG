@@ -1,0 +1,37 @@
+:root { color-scheme: light; font-family: ui-sans-serif, system-ui, sans-serif; }
+body { margin: 0; background: #f8fafc; color: #0f172a; }
+.layout { display: grid; grid-template-columns: 1fr 380px; gap: 24px; max-width: 1200px;
+          margin: 0 auto; padding: 32px 24px; align-items: start; }
+@media (max-width: 900px) { .layout { grid-template-columns: 1fr; } }
+h1 { margin: 0 0 4px; font-size: 26px; }
+.sub { margin: 0 0 20px; color: #64748b; }
+form { display: flex; gap: 8px; }
+input { flex: 1; padding: 11px 13px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 15px; }
+button { padding: 11px 18px; border: 0; border-radius: 8px; background: #0f172a;
+         color: #fff; font-size: 15px; cursor: pointer; }
+button:disabled { opacity: .5; cursor: not-allowed; }
+.demos { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0; }
+.chip { background: #e2e8f0; color: #0f172a; font-size: 13px; padding: 6px 11px; }
+.answer { background: #fff; border: 1px solid #e2e8f0; border-left: 4px solid #16a34a;
+          border-radius: 8px; padding: 16px 18px; line-height: 1.6; }
+.answer.refused { border-left-color: #dc2626; }
+.answer footer { margin-top: 12px; font-size: 13px; color: #64748b; }
+.answer code, .inspector code { background: #f1f5f9; padding: 2px 6px;
+                                border-radius: 4px; margin-right: 6px; font-size: 12px; }
+.error { color: #dc2626; }
+.inspector { background: #fff; border: 1px solid #e2e8f0; border-radius: 8px;
+             padding: 16px 18px; font-size: 14px; position: sticky; top: 24px; }
+.inspector h2 { margin: 0 0 12px; font-size: 15px; text-transform: uppercase;
+                letter-spacing: .06em; color: #64748b; }
+.inspector h3 { font-size: 13px; margin: 18px 0 8px; color: #64748b; }
+.badge { display: inline-block; color: #fff; padding: 4px 12px; border-radius: 999px;
+         font-size: 12px; font-weight: 600; text-transform: uppercase; }
+.thresholds { color: #64748b; font-size: 12px; margin: 10px 0 0; }
+.scores { list-style: none; padding: 0; margin: 0; }
+.scores li { position: relative; padding: 6px 0; border-bottom: 1px solid #f1f5f9;
+             display: flex; align-items: center; gap: 8px; }
+.bar { position: absolute; left: 0; top: 0; bottom: 0; background: #dbeafe; z-index: 0; }
+.scores code, .scores .num { position: relative; z-index: 1; }
+.num { margin-left: auto; color: #64748b; font-variant-numeric: tabular-nums; }
+.steps { margin: 0; padding-left: 18px; color: #334155; line-height: 1.8; }
+.steps em { color: #64748b; }
