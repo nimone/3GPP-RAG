@@ -8,7 +8,7 @@
 
 **Tech Stack:** Python 3.13, LangGraph, LangChain, `python-docx`, Jina embeddings v3 + reranker v2, Gemini, Neon Postgres (pgvector + tsvector), FastAPI, Vite + React, Vercel.
 
-**Spec:** `docs/superpowers/specs/2026-08-13-3gpp-rag-design.md`
+**Spec:** `docs/design.md`
 
 ## Global Constraints
 

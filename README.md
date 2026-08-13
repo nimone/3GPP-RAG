@@ -111,6 +111,20 @@ cd frontend && npm install && npm run dev
 # Open http://localhost:5173
 ```
 
+## Layout
+
+```
+api/index.py          Vercel entrypoint → FastAPI app
+src/threegpp_rag/     package: config, db, jina, retrieval, generate, app
+  ingest/             docx + OpenAPI parsers, chunker, ingestion CLI
+  crag/               decompose, action trigger, LangGraph state machine
+frontend/             Vite + React chat UI and inspector panel
+eval/                 golden set, scorecard, RAG vs CRAG study
+tests/                pytest suite (50 tests, no network)
+docs/                 design.md (spec), plan.md (implementation plan)
+schema.sql            Neon: chunks table + tsvector trigger
+```
+
 ## Testing
 
 ```bash

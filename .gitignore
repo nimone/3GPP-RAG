@@ -5,3 +5,4 @@ data/raw/
 frontend/node_modules/
 frontend/dist/
 .vercel/
+.pytest_cache/
