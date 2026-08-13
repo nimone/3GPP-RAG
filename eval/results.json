@@ -1,0 +1,292 @@
+[
+  {
+    "query": "What is the capital of France?",
+    "expected": "REFUSE",
+    "correct": true,
+    "hallucinated": false,
+    "false_refusal": false,
+    "citation_ok": true,
+    "action": "incorrect"
+  },
+  {
+    "query": "How do I configure a Cisco router interface?",
+    "expected": "REFUSE",
+    "correct": true,
+    "hallucinated": false,
+    "false_refusal": false,
+    "citation_ok": true,
+    "action": "incorrect"
+  },
+  {
+    "query": "What is Mavenir's quarterly revenue?",
+    "expected": "REFUSE",
+    "correct": true,
+    "hallucinated": false,
+    "false_refusal": false,
+    "citation_ok": true,
+    "action": "incorrect"
+  },
+  {
+    "query": "What is the pricing model for 5G network slices?",
+    "expected": "REFUSE",
+    "correct": true,
+    "hallucinated": false,
+    "false_refusal": false,
+    "citation_ok": true,
+    "action": "incorrect"
+  },
+  {
+    "query": "Which vendor has the best RAN equipment?",
+    "expected": "REFUSE",
+    "correct": true,
+    "hallucinated": false,
+    "false_refusal": false,
+    "citation_ok": true,
+    "action": "incorrect"
+  },
+  {
+    "query": "How do I write a Kubernetes operator in Go?",
+    "expected": "REFUSE",
+    "correct": true,
+    "hallucinated": false,
+    "false_refusal": false,
+    "citation_ok": true,
+    "action": "incorrect"
+  },
+  {
+    "query": "What will 6G alarm management look like?",
+    "expected": "REFUSE",
+    "correct": true,
+    "hallucinated": false,
+    "false_refusal": false,
+    "citation_ok": true,
+    "action": "ambiguous"
+  },
+  {
+    "query": "What is the recommended staffing for a NOC team?",
+    "expected": "REFUSE",
+    "correct": true,
+    "hallucinated": false,
+    "false_refusal": false,
+    "citation_ok": true,
+    "action": "incorrect"
+  },
+  {
+    "query": "How do I reset my password on the OSS portal?",
+    "expected": "REFUSE",
+    "correct": true,
+    "hallucinated": false,
+    "false_refusal": false,
+    "citation_ok": true,
+    "action": "incorrect"
+  },
+  {
+    "query": "What is the SLA penalty for exceeding alarm response time?",
+    "expected": "REFUSE",
+    "correct": true,
+    "hallucinated": false,
+    "false_refusal": false,
+    "citation_ok": true,
+    "action": "incorrect"
+  },
+  {
+    "query": "What is an alarm notification in 3GPP fault management?",
+    "expected": "alarm",
+    "citation": "TS 28.111 \u00a76.12",
+    "correct": true,
+    "hallucinated": false,
+    "false_refusal": false,
+    "citation_ok": false,
+    "action": "correct"
+  },
+  {
+    "query": "What are the requirements for alarm supervision in 3GPP?",
+    "expected": "alarm",
+    "citation": "TS 28.111 \u00a75",
+    "correct": true,
+    "hallucinated": false,
+    "false_refusal": false,
+    "citation_ok": true,
+    "action": "correct"
+  },
+  {
+    "query": "What does the AlarmRecord schema contain?",
+    "expected": "alarmId",
+    "citation": "TS 28.111 \u00a7OpenAPI/FaultNrm#AlarmRecord",
+    "correct": true,
+    "hallucinated": false,
+    "false_refusal": false,
+    "citation_ok": true,
+    "action": "correct"
+  },
+  {
+    "query": "What is alarm correlation?",
+    "expected": "correl",
+    "citation": "TS 28.111 \u00a76.10",
+    "correct": true,
+    "hallucinated": false,
+    "false_refusal": false,
+    "citation_ok": true,
+    "action": "correct"
+  },
+  {
+    "query": "How are alarms reported via notifications?",
+    "expected": "notification",
+    "citation": "TS 28.111 \u00a78.1",
+    "correct": true,
+    "hallucinated": false,
+    "false_refusal": false,
+    "citation_ok": true,
+    "action": "correct"
+  },
+  {
+    "query": "What is the model-driven approach in fault management?",
+    "expected": "model",
+    "citation": "TS 28.111 \u00a76.2",
+    "correct": true,
+    "hallucinated": false,
+    "false_refusal": false,
+    "citation_ok": true,
+    "action": "correct"
+  },
+  {
+    "query": "What is the heartbeat notification used for?",
+    "expected": "heartbeat",
+    "citation": "TS 28.532 \u00a7OpenAPI/HeartbeatNtf#HeartbeatNotification",
+    "correct": true,
+    "hallucinated": false,
+    "false_refusal": false,
+    "citation_ok": false,
+    "action": "correct"
+  },
+  {
+    "query": "What is the getMOIAttributes operation?",
+    "expected": "attribute",
+    "citation": "TS 28.532 \u00a712.1.3.1.3",
+    "correct": true,
+    "hallucinated": false,
+    "false_refusal": false,
+    "citation_ok": true,
+    "action": "correct"
+  },
+  {
+    "query": "What is the performance data file naming convention?",
+    "expected": "file",
+    "citation": "TS 28.532 \u00a711.3.2.1.4",
+    "correct": true,
+    "hallucinated": false,
+    "false_refusal": false,
+    "citation_ok": true,
+    "action": "correct"
+  },
+  {
+    "query": "How is streaming data reported in management services?",
+    "expected": "stream",
+    "citation": "TS 28.532 \u00a7OpenAPI/StreamingDataMnS",
+    "correct": true,
+    "hallucinated": false,
+    "false_refusal": false,
+    "citation_ok": false,
+    "action": "correct"
+  },
+  {
+    "query": "What is the definition of a performance data file?",
+    "expected": "file",
+    "citation": "TS 28.532 \u00a711.4.1.1.1",
+    "correct": true,
+    "hallucinated": false,
+    "false_refusal": false,
+    "citation_ok": false,
+    "action": "correct"
+  },
+  {
+    "query": "What is virtualised resource usage measurement?",
+    "expected": "virtual",
+    "citation": "TS 28.552 \u00a76.2",
+    "correct": true,
+    "hallucinated": false,
+    "false_refusal": false,
+    "citation_ok": true,
+    "action": "correct"
+  },
+  {
+    "query": "What does Number of PDU Sessions failed to setup measure?",
+    "expected": "PDU",
+    "citation": "TS 28.552 \u00a75.8.1.1.3",
+    "correct": true,
+    "hallucinated": false,
+    "false_refusal": false,
+    "citation_ok": true,
+    "action": "correct"
+  },
+  {
+    "query": "What is measured by Number of MT SMS delivery procedure requests?",
+    "expected": "SMS",
+    "citation": "TS 28.552 \u00a75.12.2.1",
+    "correct": true,
+    "hallucinated": false,
+    "false_refusal": false,
+    "citation_ok": true,
+    "action": "correct"
+  },
+  {
+    "query": "What is the Number of successful subscription data retrieval metric?",
+    "expected": "subscription",
+    "citation": "TS 28.552 \u00a75.6.8.1.2",
+    "correct": true,
+    "hallucinated": false,
+    "false_refusal": false,
+    "citation_ok": true,
+    "action": "correct"
+  },
+  {
+    "query": "What does Number of successful AF traffic influence creations measure?",
+    "expected": "AF",
+    "citation": "TS 28.552 \u00a75.9.5.1.2",
+    "correct": true,
+    "hallucinated": false,
+    "false_refusal": false,
+    "citation_ok": true,
+    "action": "correct"
+  },
+  {
+    "query": "What is measured by Number of service responses generated by NWDAF?",
+    "expected": "NWDAF",
+    "citation": "TS 28.552 \u00a75.18.3.3.2",
+    "correct": true,
+    "hallucinated": false,
+    "false_refusal": false,
+    "citation_ok": true,
+    "action": "correct"
+  },
+  {
+    "query": "What are LTM Handovers in 3GPP?",
+    "expected": "handover",
+    "citation": "TS 28.552 \u00a75.1.1.6.11",
+    "correct": false,
+    "hallucinated": false,
+    "false_refusal": true,
+    "citation_ok": true,
+    "action": "correct"
+  },
+  {
+    "query": "What does the NotifyDataNodeTreeSyncRecommended notification carry?",
+    "expected": "sync",
+    "citation": "TS 28.532 \u00a7OpenAPI/ProvMnS#NotifyDataNodeTreeSyncRecommended",
+    "correct": false,
+    "hallucinated": false,
+    "false_refusal": true,
+    "citation_ok": false,
+    "action": "correct"
+  },
+  {
+    "query": "What is Number of AM policy association update notify requests?",
+    "expected": "policy",
+    "citation": "TS 28.552 \u00a75.5.1.5",
+    "correct": true,
+    "hallucinated": false,
+    "false_refusal": false,
+    "citation_ok": true,
+    "action": "correct"
+  }
+]

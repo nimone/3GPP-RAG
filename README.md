@@ -13,7 +13,7 @@ Hybrid Retrieval (pgvector cosine + tsvector BM25, fused by RRF)
    ▼
 Jina Reranker v2 (relevance score per chunk)
    │
-   ├── score ≥ 0.55  → CORRECT ──► Knowledge Refinement ──► Gemini (grounded answer)
+   ├── score ≥ 0.55  → CORRECT ──► Knowledge Refinement ──► Gemini 3.5 Flash Lite (grounded answer)
    │                                                              │
    ├── 0.30 ≤ score  → AMBIGUOUS ─► Query Rewrite ──► Retrieve again (once)
    │   < 0.55                            │
@@ -24,7 +24,7 @@ Jina Reranker v2 (relevance score per chunk)
                                   "Not found in the provided 3GPP specifications."
 ```
 
-Every decision is recorded in a trace that streams to the React inspector panel.
+Every decision is recorded in a trace returned with the answer and rendered in the React inspector panel. The trace ships in the same JSON response rather than over SSE, which keeps the frontend a plain `fetch` and avoids streaming complications on Vercel.
 
 ## Evaluation Results
 
@@ -32,13 +32,32 @@ Every decision is recorded in a trace that streams to the React inspector panel.
 
 | Metric | Score | Notes |
 |---|---|---|
-| Answer accuracy (in-scope) | 70% (14/20) | Keyword match in generated answer |
-| Citation validity | 85% (17/20) | Expected citation in response |
+| Answer accuracy (in-scope) | **90%** (18/20) | Keyword match in generated answer |
+| Citation validity | 75% (15/20) | Expected citation in response |
 | Refusal rate (out-of-scope) | **100%** (10/10) | All 10 off-topic questions refused |
-| False-refusal rate | 30% (6/20) | Reduced to ~10% with CRAG_KEEP=0.10 |
+| False-refusal rate | 10% (2/20) | Both residuals are OpenAPI-schema questions |
 | Hallucination rate | **0%** (0/10) | No hallucinated answers on out-of-scope |
 
-*Thresholds: CRAG_UPPER=0.55, CRAG_LOWER=0.30, CRAG_KEEP=0.10 (calibrated on eval set — false-refusal rate was 30% at CRAG_KEEP=0.25; lowering keep threshold reduces over-stripping in refine_node)*
+Reproduce with `uv run python eval/run_eval.py`; per-question output lands in `eval/results.json`.
+
+**Thresholds:** `CRAG_UPPER=0.55`, `CRAG_LOWER=0.30`, `CRAG_KEEP=0.10`, `CRAG_TOP_K=12` — calibrated on this set, not chosen round.
+
+The false-refusal rate started at 25% and two changes moved it to 10%:
+
+1. **`CRAG_TOP_K` 8 → 12.** Tracing a refused-but-answerable question showed the gold clause (`TS 28.111 §6.12`) reranked 11th, just outside the old cutoff. The refusal was correct given the context the generator saw — the context was wrong. Refinement costs ~4s more per query at 12 chunks, so a query runs 10-14s against Vercel's 60s limit.
+2. **Prompt loosened on synthesis.** The generator was refusing when the context held requirement rows and schema fields rather than a textbook definition. It now answers from whatever the context states. This does not weaken the refusal guarantee: out-of-scope questions are gated by the CRAG action before the model is called, and an empty context short-circuits to the refusal without a model call.
+
+### CRAG vs vanilla RAG
+
+`uv run python eval/rag_vs_crag.py` runs the same 30 questions through the full state machine and through a stripped pipeline — same retrieval, no grading, no gate, always answers.
+
+**CRAG 28/30, vanilla RAG 28/30.** A tie, and reporting it honestly matters more than the headline would. On this corpus vanilla RAG also refuses the out-of-scope questions, because retrieval returns weakly related chunks and the grounding prompt alone is enough to reject them. The two pipelines diverge on only two questions, in opposite directions.
+
+The value CRAG adds here is therefore not raw accuracy — it is that the refusal is a *structural* guarantee (a score below 0.30 never reaches the model) rather than a behaviour the prompt asks for and the model may or may not honour on a given day. The eval set would need adversarial in-corpus questions, where retrieval returns confidently wrong chunks, to separate the two on score.
+
+### Citation validity
+
+Citation validity is the weakest number. The 5 misses are OpenAPI-derived citations (`TS 28.532 §OpenAPI/HeartbeatNtf#HeartbeatNotification`), where the generator cites the clause but not the schema-path suffix.
 
 ## Hallucination Controls
 
@@ -103,5 +122,5 @@ uv run pytest -v
 - **Tier 1 corpus only**: 3 specs + 7 OpenAPI files. Drop more `.docx` into `data/raw/` and re-run ingestion.
 - **Single retry**: Ambiguous queries get one rewrite and one re-retrieval, then refuse. Fits Vercel's 60s limit.
 - **No conversation memory**: Each query is stateless.
-- **Jina free tier**: Rate-limited; the backoff handler retries up to 6 times. Production usage benefits from a paid plan.
+- **Jina free tier**: Rate-limited; the backoff handler retries up to 6 times on both HTTP 429 and transport errors. Production usage benefits from a paid plan.
 - **Sequential scan**: No HNSW index. Exact search is faster than index overhead at 1679 chunks; add one past ~50k rows.

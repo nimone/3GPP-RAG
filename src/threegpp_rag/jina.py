@@ -11,15 +11,27 @@ DIMENSIONS = 1024
 MAX_ATTEMPTS = 6
 
 def _post(url: str, payload: dict, api_key: str, client: httpx.Client, base_delay: float) -> dict:
-    """POST with exponential backoff on 429. Jina's free tier rate-limits aggressively."""
+    """POST with exponential backoff on 429 and transport errors.
+
+    Jina's free tier rate-limits aggressively, and a dropped TLS handshake is
+    just as fatal to a request as a 429 — both retry on the same schedule.
+    """
     delay = base_delay
     for attempt in range(1, MAX_ATTEMPTS + 1):
-        resp = client.post(
-            url,
-            json=payload,
-            headers={"Authorization": f"Bearer {api_key}", "content-type": "application/json"},
-            timeout=120.0,
-        )
+        try:
+            resp = client.post(
+                url,
+                json=payload,
+                headers={"Authorization": f"Bearer {api_key}", "content-type": "application/json"},
+                timeout=120.0,
+            )
+        except httpx.TransportError as e:
+            if attempt == MAX_ATTEMPTS:
+                raise RuntimeError(f"Jina unreachable after {MAX_ATTEMPTS} attempts: {e}") from e
+            print(f"  jina transport error ({e}), retrying in {delay}s (attempt {attempt}/{MAX_ATTEMPTS})")
+            time.sleep(delay)
+            delay = delay * 2 if delay else 0.0
+            continue
         if resp.status_code == 429:
             if attempt == MAX_ATTEMPTS:
                 raise RuntimeError(f"Jina rate limit: exhausted {MAX_ATTEMPTS} attempts")

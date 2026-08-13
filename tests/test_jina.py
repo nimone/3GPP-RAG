@@ -1,4 +1,5 @@
 import httpx, pytest
+from threegpp_rag import jina
 from threegpp_rag.jina import embed, rerank
 
 def _client(handler):
@@ -44,3 +45,19 @@ def test_raises_after_exhausting_retries():
         return httpx.Response(429, json={"detail": "rate limited"})
     with pytest.raises(RuntimeError, match="rate limit"):
         rerank("q", ["a"], api_key="k", client=_client(handler), base_delay=0.0)
+
+
+def test_post_retries_transport_error(monkeypatch):
+    """A dropped connection must retry, not kill the request."""
+    monkeypatch.setattr(jina.time, "sleep", lambda s: None)
+    calls = {"n": 0}
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        calls["n"] += 1
+        if calls["n"] == 1:
+            raise httpx.ConnectTimeout("handshake timed out", request=request)
+        return httpx.Response(200, json={"results": [{"index": 0, "relevance_score": 0.7}]})
+
+    client = httpx.Client(transport=httpx.MockTransport(handler))
+    assert jina.rerank("q", ["d"], api_key="k", client=client, base_delay=0) == [0.7]
+    assert calls["n"] == 2

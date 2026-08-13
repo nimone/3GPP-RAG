@@ -13,9 +13,14 @@ Rules:
    knowledge of 3GPP or telecoms.
 2. Cite the source for every claim, using the bracketed tag shown in the context,
    for example: TS 28.111 §4.1
-3. If the CONTEXT does not contain the answer, reply with exactly:
+3. The context is extracted clauses, requirement rows and table fragments, not
+   prose written to answer the question. Synthesise your answer from whatever it
+   states — a requirement, a table row or a schema field is a valid basis for an
+   answer. Partial information is worth reporting; say what the context states.
+4. Reply with exactly this sentence, and nothing else, ONLY when the context says
+   nothing relevant to the question at all:
    {refusal}
-4. Do not apologise or explain what you cannot do. Answer, or give the exact
+5. Do not apologise or explain what you cannot do. Answer, or give the exact
    refusal sentence.
 
 CONTEXT:

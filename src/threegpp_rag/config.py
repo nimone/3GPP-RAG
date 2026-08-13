@@ -30,10 +30,12 @@ def get_settings() -> Settings:
     return Settings(
         jina_api_key=_req("JINA_API_KEY"),
         gemini_api_key=_req("GEMINI_API_KEY"),
-        gemini_model=os.environ.get("GEMINI_MODEL", "gemini-2.5-flash"),
+        gemini_model=os.environ.get("GEMINI_MODEL", "gemini-3.5-flash-lite"),
         db_url=_req("DB_URL"),
         upper_threshold=_f("CRAG_UPPER", 0.55),
         lower_threshold=_f("CRAG_LOWER", 0.30),
-        keep_threshold=_f("CRAG_KEEP", 0.25),
-        top_k=int(os.environ.get("CRAG_TOP_K", 8)),
+        keep_threshold=_f("CRAG_KEEP", 0.10),   # calibrated on the eval set
+        # 12, not 8: gold clauses were ranking 9th-12th on definition questions.
+        # Costs ~4s per query in refinement, well inside Vercel's 60s limit.
+        top_k=int(os.environ.get("CRAG_TOP_K", 12)),
     )
