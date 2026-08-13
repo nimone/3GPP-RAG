@@ -16,7 +16,7 @@ def _f(name: str, default: float) -> float:
 
 @dataclass(frozen=True)
 class Settings:
-    cohere_api_key: str
+    jina_api_key: str
     gemini_api_key: str
     gemini_model: str
     db_url: str
@@ -28,7 +28,7 @@ class Settings:
 @lru_cache(maxsize=1)
 def get_settings() -> Settings:
     return Settings(
-        cohere_api_key=_req("COHERE_API_KEY"),
+        jina_api_key=_req("JINA_API_KEY"),
         gemini_api_key=_req("GEMINI_API_KEY"),
         gemini_model=os.environ.get("GEMINI_MODEL", "gemini-2.5-flash"),
         db_url=_req("DB_URL"),

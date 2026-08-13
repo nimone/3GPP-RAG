@@ -1,22 +1,17 @@
-"""
-Embedding and reranking via Cohere API.
-Named jina.py for interface compatibility with the plan; backend is Cohere.
-Cohere embed-multilingual-v3.0 produces 1024-dim vectors matching schema.sql.
-"""
 import time
 from typing import Literal
 import httpx
 from threegpp_rag.config import get_settings
 
-EMBED_URL = "https://api.cohere.ai/v1/embed"
-RERANK_URL = "https://api.cohere.ai/v1/rerank"
-EMBED_MODEL = "embed-multilingual-v3.0"
-RERANK_MODEL = "rerank-multilingual-v3.0"
+EMBED_URL = "https://api.jina.ai/v1/embeddings"
+RERANK_URL = "https://api.jina.ai/v1/rerank"
+EMBED_MODEL = "jina-embeddings-v3"
+RERANK_MODEL = "jina-reranker-v2-base-multilingual"
 DIMENSIONS = 1024
 MAX_ATTEMPTS = 6
 
 def _post(url: str, payload: dict, api_key: str, client: httpx.Client, base_delay: float) -> dict:
-    """POST with exponential backoff on 429."""
+    """POST with exponential backoff on 429. Jina's free tier rate-limits aggressively."""
     delay = base_delay
     for attempt in range(1, MAX_ATTEMPTS + 1):
         resp = client.post(
@@ -27,13 +22,13 @@ def _post(url: str, payload: dict, api_key: str, client: httpx.Client, base_dela
         )
         if resp.status_code == 429:
             if attempt == MAX_ATTEMPTS:
-                raise RuntimeError(f"Cohere rate limit: exhausted {MAX_ATTEMPTS} attempts")
-            print(f"  cohere 429, retrying in {delay}s (attempt {attempt}/{MAX_ATTEMPTS})")
+                raise RuntimeError(f"Jina rate limit: exhausted {MAX_ATTEMPTS} attempts")
+            print(f"  jina 429, retrying in {delay}s (attempt {attempt}/{MAX_ATTEMPTS})")
             time.sleep(delay)
             delay = delay * 2 if delay else 0.0
             continue
         if resp.status_code != 200:
-            raise RuntimeError(f"Cohere error {resp.status_code}: {resp.text}")
+            raise RuntimeError(f"Jina error {resp.status_code}: {resp.text}")
         return resp.json()
     raise RuntimeError("unreachable")
 
@@ -47,22 +42,22 @@ def embed(
 ) -> list[list[float]]:
     if not texts:
         return []
-    api_key = api_key or get_settings().cohere_api_key
+    api_key = api_key or get_settings().jina_api_key
     owned = client is None
     client = client or httpx.Client()
     try:
-        input_type = "search_query" if task == "query" else "search_document"
         data = _post(EMBED_URL, {
             "model": EMBED_MODEL,
-            "texts": texts,
-            "input_type": input_type,
-            "embedding_types": ["float"],
+            "input": texts,
+            "task": "retrieval.query" if task == "query" else "retrieval.passage",
+            "dimensions": DIMENSIONS,
+            "truncate": True,
         }, api_key, client, base_delay)
     finally:
         if owned:
             client.close()
-    # Cohere returns embeddings in the same order as input texts.
-    return data["embeddings"]["float"]
+    # Results may arrive out of order — sort by index before returning.
+    return [d["embedding"] for d in sorted(data["data"], key=lambda d: d["index"])]
 
 def rerank(
     query: str,
@@ -75,7 +70,7 @@ def rerank(
     """Relevance score in [0,1] per doc, aligned to input order."""
     if not docs:
         return []
-    api_key = api_key or get_settings().cohere_api_key
+    api_key = api_key or get_settings().jina_api_key
     owned = client is None
     client = client or httpx.Client()
     try:
@@ -88,7 +83,7 @@ def rerank(
     finally:
         if owned:
             client.close()
-    # Cohere sorts by relevance — realign to input order.
+    # Jina sorts by relevance — realign to input order.
     scores = [0.0] * len(docs)
     for r in data["results"]:
         scores[r["index"]] = r["relevance_score"]
