@@ -2,70 +2,96 @@
 
 @layer base {
   :root {
-    --background: 240 10% 3.9%;
-    --foreground: 0 0% 98%;
-    --card: 240 10% 6%;
-    --card-foreground: 0 0% 98%;
-    --popover: 240 10% 6%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 0 0% 98%;
-    --primary-foreground: 240 5.9% 10%;
-    --secondary: 240 3.7% 15.9%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 240 3.7% 15.9%;
-    --muted-foreground: 240 5% 64.9%;
-    --accent: 240 3.7% 15.9%;
-    --accent-foreground: 0 0% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 240 3.7% 18%;
-    --input: 240 3.7% 18%;
-    --ring: 240 4.9% 83.9%;
-    --radius: 0.75rem;
+    /* Vercel Light Theme Design Tokens */
+    --background: 0 0% 100%;       /* #ffffff */
+    --foreground: 0 0% 9%;         /* #171717 */
+    --canvas-soft: 0 0% 98%;       /* #fafafa */
+    --canvas-soft-2: 0 0% 96%;     /* #f5f5f5 */
 
-    --sidebar: 240 10% 4.5%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
+    --card: 0 0% 100%;             /* #ffffff */
+    --card-foreground: 0 0% 9%;    /* #171717 */
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 9%;
+
+    --primary: 0 0% 9%;            /* #171717 black ink */
+    --primary-foreground: 0 0% 100%; /* #ffffff */
+
+    --secondary: 0 0% 96%;         /* #f5f5f5 */
+    --secondary-foreground: 0 0% 9%;
+
+    --muted: 0 0% 96%;             /* #f5f5f5 */
+    --muted-foreground: 0 0% 45%;  /* #737373 */
+
+    --accent: 0 0% 96%;
+    --accent-foreground: 0 0% 9%;
+
+    --destructive: 0 84% 45%;      /* #ee0000 */
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 0 0% 92%;            /* #ebebeb hairline */
+    --input: 0 0% 92%;
+    --ring: 0 0% 9%;
+    --radius: 0.5rem;              /* 8px base */
+
+    --sidebar: 0 0% 98%;
+    --sidebar-foreground: 0 0% 9%;
+    --sidebar-primary: 0 0% 9%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 12%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15%;
+    --sidebar-accent: 0 0% 94%;
+    --sidebar-accent-foreground: 0 0% 9%;
+    --sidebar-border: 0 0% 92%;
   }
 
-  .light {
-    --background: 0 0% 100%;
-    --foreground: 240 10% 3.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 240 10% 3.9%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 240 10% 3.9%;
-    --primary: 240 5.9% 10%;
-    --primary-foreground: 0 0% 98%;
-    --secondary: 240 4.8% 95.9%;
-    --secondary-foreground: 240 5.9% 10%;
-    --muted: 240 4.8% 95.9%;
-    --muted-foreground: 240 3.8% 46.1%;
-    --accent: 240 4.8% 95.9%;
-    --accent-foreground: 240 5.9% 10%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 240 5.9% 90%;
-    --input: 240 5.9% 90%;
-    --ring: 240 5.9% 10%;
+  .dark {
+    /* Vercel Dark Theme Tokens */
+    --background: 0 0% 4%;         /* #0a0a0a */
+    --foreground: 0 0% 93%;        /* #ededed */
+    --canvas-soft: 0 0% 7%;        /* #121212 */
+    --canvas-soft-2: 0 0% 10%;     /* #1a1a1a */
 
-    --sidebar: 240 5% 97%;
-    --sidebar-foreground: 240 5.9% 10%;
-    --sidebar-primary: 240 5.9% 10%;
-    --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 240 4.8% 92%;
-    --sidebar-accent-foreground: 240 5.9% 10%;
-    --sidebar-border: 240 5.9% 88%;
+    --card: 0 0% 7%;              /* #121212 */
+    --card-foreground: 0 0% 93%;
+    --popover: 0 0% 7%;
+    --popover-foreground: 0 0% 93%;
+
+    --primary: 0 0% 93%;           /* #ededed */
+    --primary-foreground: 0 0% 7%; /* #121212 */
+
+    --secondary: 0 0% 12%;         /* #1f1f1f */
+    --secondary-foreground: 0 0% 93%;
+
+    --muted: 0 0% 12%;
+    --muted-foreground: 0 0% 55%;  /* #8c8c8c */
+
+    --accent: 0 0% 12%;
+    --accent-foreground: 0 0% 93%;
+
+    --destructive: 0 75% 55%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 0 0% 15%;            /* #262626 */
+    --input: 0 0% 15%;
+    --ring: 0 0% 85%;
+    --radius: 0.5rem;
+
+    --sidebar: 0 0% 5%;            /* #0d0d0d */
+    --sidebar-foreground: 0 0% 93%;
+    --sidebar-primary: 0 0% 93%;
+    --sidebar-primary-foreground: 0 0% 7%;
+    --sidebar-accent: 0 0% 10%;
+    --sidebar-accent-foreground: 0 0% 93%;
+    --sidebar-border: 0 0% 14%;
   }
 }
 
 @theme {
+  --font-sans: "Geist", "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-mono: "Geist Mono", "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, monospace;
+
   --color-background: hsl(var(--background));
   --color-foreground: hsl(var(--foreground));
+  --color-canvas-soft: hsl(var(--canvas-soft));
+  --color-canvas-soft-2: hsl(var(--canvas-soft-2));
   --color-card: hsl(var(--card));
   --color-card-foreground: hsl(var(--card-foreground));
   --color-popover: hsl(var(--popover));
@@ -100,16 +126,39 @@
 body {
   margin: 0;
   padding: 0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-family: var(--font-sans);
   background-color: hsl(var(--background));
   color: hsl(var(--foreground));
   overflow-x: hidden;
+  letter-spacing: -0.011em;
 }
 
-/* Custom smooth scrollbar */
+/* Stacked Elevation System from DESIGN.md */
+.shadow-elevation-1 {
+  box-shadow: 0 0 0 1px hsl(var(--border)), 0 1px 2px 0 rgba(0, 0, 0, 0.03);
+}
+
+.shadow-elevation-2 {
+  box-shadow: 0 0 0 1px hsl(var(--border)), 0px 1px 2px 0 rgba(0, 0, 0, 0.04), 0px 2px 4px 0 rgba(0, 0, 0, 0.04);
+}
+
+.shadow-elevation-3 {
+  box-shadow: 0 0 0 1px hsl(var(--border)), 0px 2px 4px 0 rgba(0, 0, 0, 0.04), 0px 8px 16px -4px rgba(0, 0, 0, 0.08);
+}
+
+/* Signature Mesh Gradient Backdrop */
+.mesh-gradient-backdrop {
+  background: radial-gradient(circle at 50% 0%, rgba(0, 124, 240, 0.12) 0%, rgba(0, 223, 216, 0.06) 30%, rgba(121, 40, 202, 0.04) 60%, transparent 80%);
+}
+
+.dark .mesh-gradient-backdrop {
+  background: radial-gradient(circle at 50% -10%, rgba(0, 124, 240, 0.18) 0%, rgba(121, 40, 202, 0.12) 35%, rgba(255, 0, 128, 0.06) 65%, transparent 85%);
+}
+
+/* Custom scrollbar */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
 }
 
 ::-webkit-scrollbar-track {
@@ -122,19 +171,31 @@ body {
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: hsl(var(--muted-foreground) / 0.4);
+  background: hsl(var(--muted-foreground) / 0.45);
 }
 
-/* Markdown typography styling */
+/* Tabular nums for clean alignment */
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Text balance on headings */
+h1, h2, h3, h4 {
+  text-wrap: balance;
+  letter-spacing: -0.03em;
+}
+
+/* Markdown typography styling matching Vercel design */
 .prose-custom {
   font-size: 0.9375rem;
-  line-height: 1.65;
+  line-height: 1.68;
   color: hsl(var(--foreground));
+  word-break: break-word;
 }
 
 .prose-custom p {
-  margin-top: 0.6rem;
-  margin-bottom: 0.6rem;
+  margin-top: 0.625rem;
+  margin-bottom: 0.625rem;
 }
 
 .prose-custom p:first-child {
@@ -153,27 +214,29 @@ body {
   margin-top: 1.25rem;
   margin-bottom: 0.5rem;
   color: hsl(var(--foreground));
+  letter-spacing: -0.025em;
 }
 
 .prose-custom ul,
 .prose-custom ol {
   margin-top: 0.5rem;
   margin-bottom: 0.5rem;
-  padding-left: 1.25rem;
+  padding-left: 1.35rem;
 }
 
 .prose-custom li {
-  margin-top: 0.25rem;
-  margin-bottom: 0.25rem;
+  margin-top: 0.3rem;
+  margin-bottom: 0.3rem;
 }
 
 .prose-custom code {
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-  font-size: 0.85em;
+  font-family: var(--font-mono);
+  font-size: 0.825em;
   background: hsl(var(--muted));
   padding: 0.15rem 0.35rem;
-  border-radius: 0.35rem;
-  border: 1px solid hsl(var(--border) / 0.6);
+  border-radius: 0.3rem;
+  border: 1px solid hsl(var(--border));
+  color: hsl(var(--foreground));
 }
 
 .prose-custom pre {
@@ -211,9 +274,21 @@ body {
 }
 
 .prose-custom blockquote {
-  border-left: 3px solid hsl(var(--primary) / 0.5);
+  border-left: 2px solid hsl(var(--primary));
   padding-left: 0.85rem;
   margin: 0.75rem 0;
   color: hsl(var(--muted-foreground));
   font-style: italic;
+}
+
+/* Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

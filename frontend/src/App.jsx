@@ -2,22 +2,16 @@ import React, { useState, useEffect, useRef } from "react"
 import {
   Menu,
   Sliders,
-  Sparkles,
   Bot,
-  RefreshCw,
   Trash2,
-  Share2,
-  ChevronDown,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { ScrollArea } from "@/components/ui/scroll-area"
 import Sidebar from "@/components/Sidebar"
 import ChatMessage from "@/components/ChatMessage"
 import ChatInput from "@/components/ChatInput"
 import EmptyState from "@/components/EmptyState"
 import InspectorSheet from "@/components/InspectorSheet"
-import { cn } from "@/lib/utils"
 
 const STORAGE_KEY = "3gpp_rag_chats_v2"
 const THEME_KEY = "3gpp_rag_theme"
@@ -383,7 +377,15 @@ export default function App() {
 
   return (
     <div className="flex h-screen w-screen overflow-hidden bg-background text-foreground">
-      {/* Sidebar */}
+      {/* Skip to content link for accessibility */}
+      <a
+        href="#main-chat-content"
+        className="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:p-3 focus:bg-primary focus:text-primary-foreground focus:rounded-md focus:m-2"
+      >
+        Skip to main content
+      </a>
+
+      {/* Sidebar Navigation */}
       <Sidebar
         conversations={conversations}
         currentId={currentId}
@@ -404,39 +406,44 @@ export default function App() {
       />
 
       {/* Main Workspace */}
-      <div className="relative flex flex-1 flex-col overflow-hidden">
+      <div className="relative flex flex-1 flex-col overflow-hidden min-w-0">
         {/* Top Navigation Bar */}
-        <header className="flex h-14 items-center justify-between border-b border-border bg-background/80 px-4 backdrop-blur-md z-20 shrink-0">
+        <header
+          role="banner"
+          className="flex h-12 items-center justify-between border-b border-border bg-background/80 px-4 backdrop-blur-md z-20 shrink-0"
+        >
           <div className="flex items-center gap-2">
             <Button
               variant="ghost"
               size="iconSm"
               className="md:hidden"
               onClick={() => setSidebarOpen(true)}
+              aria-label="Toggle navigation sidebar"
             >
-              <Menu className="h-5 w-5" />
+              <Menu className="h-4 w-4" aria-hidden="true" />
             </Button>
 
             <div className="flex items-center gap-2">
-              <span className="font-semibold text-sm tracking-tight text-foreground">
+              <span className="font-semibold text-xs tracking-tight text-foreground">
                 3GPP CRAG Graph
               </span>
-              <Badge variant="outline" className="hidden sm:inline-flex text-[11px] font-normal py-0">
+              <Badge variant="outline" className="hidden sm:inline-flex text-[10px] font-mono py-0">
                 Rel-18 Grounded
               </Badge>
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5">
             {currentConversation?.messages.length > 0 && (
               <Button
                 variant="ghost"
                 size="iconSm"
                 onClick={handleClearCurrentChat}
+                aria-label="Clear current conversation messages"
                 title="Clear current conversation"
-                className="text-muted-foreground hover:text-foreground"
+                className="text-muted-foreground hover:text-foreground h-7 w-7"
               >
-                <Trash2 className="h-4 w-4" />
+                <Trash2 className="h-3.5 w-3.5" aria-hidden="true" />
               </Button>
             )}
 
@@ -444,10 +451,11 @@ export default function App() {
               <Button
                 variant={inspectorOpen ? "default" : "outline"}
                 size="sm"
-                className="h-8 gap-1.5 text-xs font-medium"
+                className="h-7 gap-1.5 text-xs font-medium px-2.5"
                 onClick={() => setInspectorOpen(!inspectorOpen)}
+                aria-label="Toggle CRAG Reasoning Inspector sheet"
               >
-                <Sliders className="h-3.5 w-3.5" />
+                <Sliders className="h-3.5 w-3.5" aria-hidden="true" />
                 <span className="hidden sm:inline">CRAG Inspector</span>
               </Button>
             )}
@@ -455,9 +463,9 @@ export default function App() {
         </header>
 
         {/* Chat Area + Right Inspector Layout */}
-        <div className="flex flex-1 overflow-hidden">
+        <main id="main-chat-content" role="main" className="flex flex-1 overflow-hidden min-w-0">
           {/* Messages Column */}
-          <div className="flex flex-1 flex-col overflow-hidden relative">
+          <div className="flex flex-1 flex-col overflow-hidden relative min-w-0">
             <div className="flex-1 overflow-y-auto">
               {!currentConversation?.messages?.length ? (
                 <EmptyState
@@ -489,25 +497,31 @@ export default function App() {
                     !currentConversation.messages.some(
                       (m) => m.role === "assistant" && m.isStreaming
                     ) && (
-                      <div className="flex w-full justify-start gap-3.5 px-4 py-4 sm:px-6 animate-in fade-in-50 duration-300">
-                        <div className="flex h-8 w-8 shrink-0 select-none items-center justify-center rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 text-white shadow-sm animate-pulse">
+                      <div
+                        className="flex w-full justify-start gap-3.5 px-4 py-4 sm:px-6 animate-in fade-in duration-200"
+                        aria-live="polite"
+                      >
+                        <div
+                          className="flex h-8 w-8 shrink-0 select-none items-center justify-center rounded-lg bg-primary text-primary-foreground shadow-elevation-1 animate-pulse"
+                          aria-hidden="true"
+                        >
                           <Bot className="h-4 w-4" />
                         </div>
-                        <div className="flex flex-col gap-2">
+                        <div className="flex flex-col gap-1.5">
                           <div className="flex items-center gap-2">
                             <span className="text-xs font-semibold text-foreground">
                               3GPP Assistant
                             </span>
                             <Badge variant="outline" className="text-[10px] animate-pulse">
-                              Executing CRAG Graph...
+                              Executing CRAG Graph…
                             </Badge>
                           </div>
-                          <div className="flex items-center gap-1.5 text-xs text-muted-foreground pt-1">
-                            <div className="h-2 w-2 rounded-full bg-blue-500 animate-bounce [animation-delay:-0.3s]" />
-                            <div className="h-2 w-2 rounded-full bg-blue-500 animate-bounce [animation-delay:-0.15s]" />
-                            <div className="h-2 w-2 rounded-full bg-blue-500 animate-bounce" />
-                            <span className="ml-2 text-xs">
-                              Retrieving, evaluating &amp; formatting spec context...
+                          <div className="flex items-center gap-1.5 text-xs text-muted-foreground pt-0.5">
+                            <div className="h-1.5 w-1.5 rounded-full bg-foreground animate-bounce [animation-delay:-0.3s]" />
+                            <div className="h-1.5 w-1.5 rounded-full bg-foreground animate-bounce [animation-delay:-0.15s]" />
+                            <div className="h-1.5 w-1.5 rounded-full bg-foreground animate-bounce" />
+                            <span className="ml-1.5 text-[11px]">
+                              Retrieving, evaluating &amp; formatting spec context…
                             </span>
                           </div>
                         </div>
@@ -520,7 +534,7 @@ export default function App() {
             </div>
 
             {/* Input Bar */}
-            <div className="shrink-0 bg-gradient-to-t from-background via-background/90 to-transparent pt-4">
+            <div className="shrink-0 bg-gradient-to-t from-background via-background/90 to-transparent pt-3">
               <ChatInput
                 input={input}
                 setInput={setInput}
@@ -552,7 +566,7 @@ export default function App() {
               onClose={() => setInspectorOpen(false)}
             />
           )}
-        </div>
+        </main>
       </div>
     </div>
   )
