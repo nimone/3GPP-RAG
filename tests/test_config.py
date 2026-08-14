@@ -10,6 +10,7 @@ def test_settings_read_from_env(monkeypatch):
     s = get_settings()
     assert s.jina_api_key == "jk"
     assert s.gemini_model == "gemini-x"
+    assert s.gemini_fallback_model == "gemini-3.1-flash-lite"
     assert s.upper_threshold == 0.55   # default
     assert s.lower_threshold == 0.30   # default
 

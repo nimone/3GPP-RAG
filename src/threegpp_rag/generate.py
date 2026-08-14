@@ -1,6 +1,9 @@
+import logging
 from typing import Iterator
 from google import genai
 from threegpp_rag.config import get_settings
+
+logger = logging.getLogger(__name__)
 
 REFUSAL = "Not found in the provided 3GPP specifications."
 
@@ -42,49 +45,115 @@ def answer(question: str, context: str) -> str:
     # Empty context means retrieval rejected everything — refuse without a model call.
     if not context.strip():
         return REFUSAL
-    resp = _client().models.generate_content(
-        model=get_settings().gemini_model,
-        contents=build_prompt(question, context),
-    )
-    return (resp.text or REFUSAL).strip()
+    settings = get_settings()
+    client = _client()
+    contents = build_prompt(question, context)
+    try:
+        resp = client.models.generate_content(
+            model=settings.gemini_model,
+            contents=contents,
+        )
+        return (resp.text or REFUSAL).strip()
+    except Exception as e:
+        fallback = settings.gemini_fallback_model
+        if fallback and fallback != settings.gemini_model:
+            logger.warning(
+                "Primary model %s failed (%s), attempting fallback to %s",
+                settings.gemini_model, e, fallback,
+            )
+            try:
+                resp = client.models.generate_content(
+                    model=fallback,
+                    contents=contents,
+                )
+                return (resp.text or REFUSAL).strip()
+            except Exception as fe:
+                logger.error("Fallback model %s also failed: %s", fallback, fe)
+                raise fe from e
+        raise e
 
 def answer_stream(question: str, context: str) -> Iterator[str]:
     """Yield answer text chunks as they are generated."""
     if not context.strip():
         yield REFUSAL
         return
+    settings = get_settings()
+    client = _client()
+    contents = build_prompt(question, context)
     try:
-        resp_stream = _client().models.generate_content_stream(
-            model=get_settings().gemini_model,
-            contents=build_prompt(question, context),
+        resp_stream = client.models.generate_content_stream(
+            model=settings.gemini_model,
+            contents=contents,
         )
         for chunk in resp_stream:
             if chunk.text:
                 yield chunk.text
-    except Exception:
+        return
+    except Exception as e:
+        fallback = settings.gemini_fallback_model
+        if fallback and fallback != settings.gemini_model:
+            logger.warning(
+                "Primary model %s stream failed (%s), attempting fallback stream to %s",
+                settings.gemini_model, e, fallback,
+            )
+            try:
+                resp_stream = client.models.generate_content_stream(
+                    model=fallback,
+                    contents=contents,
+                )
+                for chunk in resp_stream:
+                    if chunk.text:
+                        yield chunk.text
+                return
+            except Exception as fe:
+                logger.warning("Fallback stream failed (%s), falling back to non-stream answer", fe)
         # Fallback to non-streaming if stream is unsupported
         yield answer(question, context)
 
 def rewrite_query(q: str) -> str:
     """Rewrite question as keyword search for a second retrieval pass."""
-    resp = _client().models.generate_content(
-        model=get_settings().gemini_model,
-        contents=(
-            "Rewrite this question as a short keyword search query for 3GPP "
-            "specification documents. Use technical terms likely to appear "
-            "verbatim in the specs. Return ONLY the query.\n\n"
-            f"Question: {q}"
-        ),
+    settings = get_settings()
+    client = _client()
+    contents = (
+        "Rewrite this question as a short keyword search query for 3GPP "
+        "specification documents. Use technical terms likely to appear "
+        "verbatim in the specs. Return ONLY the query.\n\n"
+        f"Question: {q}"
     )
-    return (resp.text or q).strip()
+    try:
+        resp = client.models.generate_content(
+            model=settings.gemini_model,
+            contents=contents,
+        )
+        return (resp.text or q).strip()
+    except Exception as e:
+        fallback = settings.gemini_fallback_model
+        if fallback and fallback != settings.gemini_model:
+            logger.warning(
+                "Primary model %s query rewrite failed (%s), attempting fallback to %s",
+                settings.gemini_model, e, fallback,
+            )
+            try:
+                resp = client.models.generate_content(
+                    model=fallback,
+                    contents=contents,
+                )
+                return (resp.text or q).strip()
+            except Exception:
+                return q
+        return q
 
 def check_model() -> bool:
-    """Verify GEMINI_MODEL exists — fail loudly at startup."""
+    """Verify GEMINI_MODEL or fallback model exists — fail loudly at startup."""
     try:
-        want = get_settings().gemini_model
+        settings = get_settings()
+        want = settings.gemini_model
+        fallback = settings.gemini_fallback_model
         client = _client()
         # force eager evaluation before client could be GC'd
         names = [m.name.split("/")[-1] for m in list(client.models.list())]
-        return want in names or want.split("/")[-1] in names
+        primary_ok = want in names or want.split("/")[-1] in names
+        fallback_ok = fallback in names or fallback.split("/")[-1] in names
+        return primary_ok or fallback_ok
     except Exception:
         return False

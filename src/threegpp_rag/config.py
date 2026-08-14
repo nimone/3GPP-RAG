@@ -19,6 +19,7 @@ class Settings:
     jina_api_key: str
     gemini_api_key: str
     gemini_model: str
+    gemini_fallback_model: str
     db_url: str
     upper_threshold: float
     lower_threshold: float
@@ -31,6 +32,7 @@ def get_settings() -> Settings:
         jina_api_key=_req("JINA_API_KEY"),
         gemini_api_key=_req("GEMINI_API_KEY"),
         gemini_model=os.environ.get("GEMINI_MODEL", "gemini-3.5-flash-lite"),
+        gemini_fallback_model=os.environ.get("GEMINI_FALLBACK_MODEL", "gemini-3.1-flash-lite"),
         db_url=_req("DB_URL"),
         upper_threshold=_f("CRAG_UPPER", 0.55),
         lower_threshold=_f("CRAG_LOWER", 0.30),
