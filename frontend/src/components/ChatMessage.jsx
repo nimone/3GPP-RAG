@@ -14,6 +14,8 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import MarkdownRenderer from "./MarkdownRenderer"
 import CitationBadge from "./CitationBadge"
+import ReasoningProcess from "./ReasoningProcess"
+import { ShimmerSkeleton } from "@/components/ui/shimmer"
 import { cn } from "@/lib/utils"
 
 const ACTION_CONFIG = {
@@ -47,6 +49,7 @@ export default function ChatMessage({
   const actionInfo = !isUser && message.action ? ACTION_CONFIG[message.action] : null
   const isRefused = !isUser && message.refused
   const isStreaming = !isUser && message.isStreaming
+  const hasContent = Boolean(message.content || message.answer)
 
   function handleCopy() {
     navigator.clipboard.writeText(message.content || message.answer || "")
@@ -155,6 +158,17 @@ export default function ChatMessage({
           </div>
         </div>
 
+        {/* Live / Collapsible Reasoning Process Accordion */}
+        {(message.trace?.length > 0 || isStreaming) && (
+          <ReasoningProcess
+            trace={message.trace || []}
+            action={message.action}
+            isStreaming={isStreaming}
+            currentStep={message.currentStep}
+            refused={isRefused}
+          />
+        )}
+
         {/* Refusal Notice Banner */}
         {isRefused && (
           <div className="flex items-start gap-2.5 rounded-lg border border-amber-500/30 bg-amber-500/10 p-3 text-xs text-amber-200">
@@ -170,20 +184,29 @@ export default function ChatMessage({
           </div>
         )}
 
+        {/* Shimmer Skeleton when waiting for first text token */}
+        {isStreaming && !hasContent && (
+          <div className="py-2 animate-in fade-in duration-200">
+            <ShimmerSkeleton lines={3} />
+          </div>
+        )}
+
         {/* Message Content with interactive citation parsing */}
-        <div className="prose-custom" aria-live={isStreaming ? "polite" : "off"}>
-          <MarkdownRenderer
-            content={message.content || message.answer || ""}
-            sources={message.sources || []}
-            onSelectSource={onSelectSource}
-          />
-          {isStreaming && (
-            <span
-              className="inline-block h-4 w-1.5 ml-1 bg-foreground animate-pulse align-middle rounded-xs"
-              aria-hidden="true"
+        {hasContent && (
+          <div className="prose-custom" aria-live={isStreaming ? "polite" : "off"}>
+            <MarkdownRenderer
+              content={message.content || message.answer || ""}
+              sources={message.sources || []}
+              onSelectSource={onSelectSource}
             />
-          )}
-        </div>
+            {isStreaming && (
+              <span
+                className="inline-block h-4 w-1.5 ml-1 bg-foreground animate-pulse align-middle rounded-xs"
+                aria-hidden="true"
+              />
+            )}
+          </div>
+        )}
 
         {/* Citations / Sources at bottom with hover preview */}
         {message.citations && message.citations.length > 0 && (

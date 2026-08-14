@@ -1,4 +1,6 @@
 import json
+import queue
+import threading
 from dataclasses import asdict
 from typing import Iterator
 from fastapi import FastAPI
@@ -79,15 +81,50 @@ def chat(req: ChatRequest) -> dict:
 @app.post("/api/chat/stream")
 def chat_stream(req: ChatRequest):
     def event_generator() -> Iterator[str]:
+        q: queue.Queue = queue.Queue()
         events: list[TraceEvent] = []
-        deps = deps_from_env(on_event=events.append)
-        state = run_crag(req.question, deps)
+
+        def on_event(ev: TraceEvent):
+            events.append(ev)
+            q.put(("step", asdict(ev)))
+
+        def worker():
+            try:
+                deps = deps_from_env(on_event=on_event)
+                state = run_crag(req.question, deps)
+                q.put(("state", state))
+            except Exception as e:
+                q.put(("error", str(e)))
+
+        t = threading.Thread(target=worker)
+        t.start()
+
+        state = None
+        while True:
+            try:
+                msg_type, payload = q.get(timeout=0.05)
+                if msg_type == "step":
+                    yield f"data: {json.dumps({'type': 'step', 'step': payload['step'], 'data': payload['data']})}\n\n"
+                elif msg_type == "state":
+                    state = payload
+                    break
+                elif msg_type == "error":
+                    yield f"data: {json.dumps({'type': 'error', 'error': payload})}\n\n"
+                    return
+            except queue.Empty:
+                if not t.is_alive() and q.empty():
+                    break
+                continue
+
+        t.join()
+        if not state:
+            return
+
         chunks = state.get("chunks", [])
-        
-        if state["refused"]:
+        if state.get("refused", False):
             meta_payload = {
                 "type": "meta",
-                "action": state["action"],
+                "action": state.get("action", "incorrect"),
                 "refused": True,
                 "citations": [],
                 "sources": [],

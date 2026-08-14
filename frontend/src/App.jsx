@@ -201,7 +201,27 @@ export default function App() {
           try {
             const parsed = JSON.parse(jsonStr)
 
-            if (parsed.type === "meta") {
+            if (parsed.type === "step") {
+              const stepEvt = { step: parsed.step, data: parsed.data || {} }
+              setConversations((prev) =>
+                prev.map((c) =>
+                  c.id === currentId
+                    ? {
+                        ...c,
+                        messages: c.messages.map((m) =>
+                          m.id === botMessageId
+                            ? {
+                                ...m,
+                                currentStep: parsed.step,
+                                trace: [...(m.trace || []).filter((t) => t.step !== parsed.step), stepEvt],
+                              }
+                            : m
+                        ),
+                      }
+                    : c
+                )
+              )
+            } else if (parsed.type === "meta") {
               metaData = parsed
               // Open inspector automatically when metadata is available
               const currentMeta = {
@@ -213,7 +233,6 @@ export default function App() {
                 trace: parsed.trace || [],
               }
               setActiveInspectorMessage(currentMeta)
-              setInspectorOpen(true)
 
               setConversations((prev) =>
                 prev.map((c) =>
@@ -228,7 +247,7 @@ export default function App() {
                                 refused: parsed.refused,
                                 citations: parsed.citations || [],
                                 sources: parsed.sources || [],
-                                trace: parsed.trace || [],
+                                trace: parsed.trace || m.trace || [],
                               }
                             : m
                         ),
@@ -261,7 +280,6 @@ export default function App() {
                 isStreaming: false,
               }
               setActiveInspectorMessage(finalMessage)
-              setInspectorOpen(true)
 
               setConversations((prev) =>
                 prev.map((c) =>
