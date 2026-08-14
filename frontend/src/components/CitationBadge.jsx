@@ -16,39 +16,77 @@ function cleanCitation(str) {
 
 function findMatchingSource(citationText, sources = []) {
   const clean = cleanCitation(citationText).toLowerCase().replace(/\s+/g, " ")
+  const cleanNormalized = clean.replace(/§/g, "").replace(/\s+/g, " ").trim()
+
   return sources.find((s) => {
     const sClean = cleanCitation(s.citation).toLowerCase().replace(/\s+/g, " ")
-    return (
-      sClean === clean ||
-      sClean.includes(clean) ||
-      clean.includes(sClean) ||
-      (s.clause && clean.includes(s.clause.toLowerCase()))
-    )
+    const sNorm = sClean.replace(/§/g, "").replace(/\s+/g, " ").trim()
+
+    if (sClean === clean || sNorm === cleanNormalized) return true
+    if (sClean.includes(clean) || clean.includes(sClean)) return true
+    if (sNorm.includes(cleanNormalized) || cleanNormalized.includes(sNorm)) return true
+
+    if (s.clause) {
+      const clauseClean = s.clause.toLowerCase().trim()
+      if (clean.includes(clauseClean) || clauseClean.includes(clean)) return true
+    }
+    if (s.spec) {
+      const specClean = s.spec.toLowerCase().trim()
+      if (clean.includes(specClean)) {
+        const parts = clean.split(/[§/#\s]+/).filter(Boolean)
+        if (parts.some((p) => s.clause?.toLowerCase().includes(p) || s.title?.toLowerCase().includes(p))) {
+          return true
+        }
+      }
+    }
+    return false
   })
 }
 
-export default function CitationBadge({ citation, sources = [], onSelectSource }) {
+export default function CitationBadge({
+  citation,
+  sources = [],
+  onSelectSource,
+  compact = false,
+}) {
   const cleaned = cleanCitation(citation)
   const matched = findMatchingSource(cleaned, sources)
 
   return (
     <HoverCard openDelay={120} closeDelay={100}>
       <HoverCardTrigger asChild>
-        <button
-          type="button"
-          onClick={(e) => {
-            e.stopPropagation()
-            if (onSelectSource && matched) onSelectSource(matched)
-          }}
-          aria-label={`View source specification citation ${cleaned}`}
-          className={cn(
-            "inline-flex items-center gap-1 mx-1 px-2 py-0.5 rounded text-[11px] font-mono font-medium transition-colors duration-150 align-baseline select-none cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
-            "bg-muted hover:bg-muted/80 text-foreground border border-border/80 shadow-elevation-1 active:scale-95"
-          )}
-        >
-          <BookOpen className="h-3 w-3 shrink-0 text-muted-foreground opacity-80" aria-hidden="true" />
-          <span>{cleaned}</span>
-        </button>
+        {compact ? (
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation()
+              if (onSelectSource && matched) onSelectSource(matched)
+            }}
+            aria-label={`View source citation ${cleaned}`}
+            title={cleaned}
+            className={cn(
+              "inline-flex items-center justify-center h-4 w-4 mx-0.5 rounded bg-muted/80 hover:bg-muted text-muted-foreground hover:text-foreground border border-border text-[10px] align-baseline select-none cursor-pointer transition-colors shadow-elevation-1 active:scale-95 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+            )}
+          >
+            <BookOpen className="h-2.5 w-2.5" aria-hidden="true" />
+          </button>
+        ) : (
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation()
+              if (onSelectSource && matched) onSelectSource(matched)
+            }}
+            aria-label={`View source specification citation ${cleaned}`}
+            className={cn(
+              "inline-flex items-center gap-1 mx-1 px-2 py-0.5 rounded text-[11px] font-mono font-medium transition-colors duration-150 align-baseline select-none cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
+              "bg-muted hover:bg-muted/80 text-foreground border border-border/80 shadow-elevation-1 active:scale-95"
+            )}
+          >
+            <BookOpen className="h-3 w-3 shrink-0 text-muted-foreground opacity-80" aria-hidden="true" />
+            <span>{cleaned}</span>
+          </button>
+        )}
       </HoverCardTrigger>
 
       <HoverCardContent

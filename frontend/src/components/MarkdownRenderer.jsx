@@ -3,8 +3,8 @@ import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm"
 import CitationBadge from "./CitationBadge"
 
-// Matches [TS 28.552 §5.1.1.15.2], [TS 28.532 § 11.1.1.2], [TS 28.111 §4.1], etc.
-const CITATION_REGEX = /(\[TS\s+\d+(?:\.\d+)?\s*(?:§|clause)?\s*[\d.]+\]|TS\s+\d+(?:\.\d+)?\s*(?:§|clause)\s*[\d.]+)/gi
+// Matches [TS 28.552 §5.1.1.15.2], [TS 28.111 §OpenAPI/FaultNrm#AlarmRecord], TS 28.111 §4.1, etc.
+const CITATION_REGEX = /(\[TS\s+\d+(?:\.\d+)?(?:\s*(?:§|clause|\/|#)[^\]]+)?\]|TS\s+\d+(?:\.\d+)?\s*(?:§|clause)\s*[\w./#-]+)/gi
 
 export function renderTextWithCitations(text, sources = [], onSelectSource) {
   if (typeof text !== "string") return text
@@ -20,6 +20,7 @@ export function renderTextWithCitations(text, sources = [], onSelectSource) {
           citation={part}
           sources={sources}
           onSelectSource={onSelectSource}
+          compact={true}
         />
       )
     }

@@ -237,6 +237,7 @@ export default function ChatMessage({
                     citation={c}
                     sources={message.sources || []}
                     onSelectSource={onSelectSource}
+                    compact={false}
                   />
                 ))}
               </div>
