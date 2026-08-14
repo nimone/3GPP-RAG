@@ -1,10 +1,13 @@
+import json
 from dataclasses import asdict
+from typing import Iterator
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, field_validator
 from threegpp_rag.crag.graph import deps_from_env, run_crag
 from threegpp_rag.db import query
-from threegpp_rag.generate import answer, check_model
+from threegpp_rag.generate import REFUSAL, answer, answer_stream, check_model
 from threegpp_rag.types import TraceEvent
 
 app = FastAPI(title="3GPP RAG Chatbot")
@@ -36,8 +39,12 @@ def health() -> dict:
     except Exception as e:
         model_ok = False
         print(f"health: model error {e}")
-    return {"status": "ok" if db_ok and model_ok else "degraded",
-            "db_ok": db_ok, "model_ok": model_ok, "chunks": chunks}
+    return {
+        "status": "ok" if db_ok and model_ok else "degraded",
+        "db_ok": db_ok,
+        "model_ok": model_ok,
+        "chunks": chunks,
+    }
 
 @app.post("/api/chat")
 def chat(req: ChatRequest) -> dict:
@@ -45,12 +52,87 @@ def chat(req: ChatRequest) -> dict:
     deps = deps_from_env(on_event=events.append)
     state = run_crag(req.question, deps)
     text = answer(req.question, state["context"])
-    citations = sorted({c.citation for c in state.get("chunks", [])}) \
-        if not state["refused"] else []
+    chunks = state.get("chunks", [])
+    refused = state["refused"] or (REFUSAL in text)
+    citations = sorted({c.citation for c in chunks}) if not refused else []
+    sources = [
+        {
+            "id": getattr(c, "id", str(i)),
+            "citation": c.citation,
+            "spec": getattr(c, "spec", ""),
+            "clause": getattr(c, "clause", ""),
+            "title": getattr(c, "title", ""),
+            "text": getattr(c, "text", ""),
+        }
+        for i, c in enumerate(chunks)
+    ] if not refused else []
+
     return {
         "answer": text,
         "action": state["action"],
-        "refused": state["refused"],
+        "refused": refused,
         "citations": citations,
+        "sources": sources,
         "trace": [asdict(e) for e in events],
     }
+
+@app.post("/api/chat/stream")
+def chat_stream(req: ChatRequest):
+    def event_generator() -> Iterator[str]:
+        events: list[TraceEvent] = []
+        deps = deps_from_env(on_event=events.append)
+        state = run_crag(req.question, deps)
+        chunks = state.get("chunks", [])
+        
+        if state["refused"]:
+            meta_payload = {
+                "type": "meta",
+                "action": state["action"],
+                "refused": True,
+                "citations": [],
+                "sources": [],
+                "trace": [asdict(e) for e in events],
+            }
+            yield f"data: {json.dumps(meta_payload)}\n\n"
+            yield f"data: {json.dumps({'type': 'delta', 'text': REFUSAL})}\n\n"
+            yield f"data: {json.dumps({'type': 'done'})}\n\n"
+            return
+
+        citations = sorted({c.citation for c in chunks})
+        sources = [
+            {
+                "id": getattr(c, "id", str(i)),
+                "citation": c.citation,
+                "spec": getattr(c, "spec", ""),
+                "clause": getattr(c, "clause", ""),
+                "title": getattr(c, "title", ""),
+                "text": getattr(c, "text", ""),
+            }
+            for i, c in enumerate(chunks)
+        ]
+
+        meta_payload = {
+            "type": "meta",
+            "action": state["action"],
+            "refused": False,
+            "citations": citations,
+            "sources": sources,
+            "trace": [asdict(e) for e in events],
+        }
+        yield f"data: {json.dumps(meta_payload)}\n\n"
+
+        for token in answer_stream(req.question, state["context"]):
+            if token:
+                yield f"data: {json.dumps({'type': 'delta', 'text': token})}\n\n"
+
+        yield f"data: {json.dumps({'type': 'done'})}\n\n"
+
+    return StreamingResponse(
+        event_generator(),
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "Connection": "keep-alive",
+            "X-Accel-Buffering": "no",
+        },
+    )

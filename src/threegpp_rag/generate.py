@@ -1,27 +1,24 @@
+from typing import Iterator
 from google import genai
 from threegpp_rag.config import get_settings
 
 REFUSAL = "Not found in the provided 3GPP specifications."
 
-PROMPT = """You are a 3GPP standards assistant for telecom network operations.
+PROMPT = """You are a 3GPP standards technical assistant for telecom network operations.
 
-Answer the QUESTION using ONLY the CONTEXT below. The context is extracted from
+Answer the user QUESTION using ONLY facts stated in the CONTEXT below. The context is extracted from
 3GPP specification documents.
 
 Rules:
-1. Use ONLY facts stated in the CONTEXT. Do not infer, extrapolate, or use prior
-   knowledge of 3GPP or telecoms.
-2. Cite the source for every claim, using the bracketed tag shown in the context,
-   for example: TS 28.111 §4.1
-3. The context is extracted clauses, requirement rows and table fragments, not
-   prose written to answer the question. Synthesise your answer from whatever it
-   states — a requirement, a table row or a schema field is a valid basis for an
-   answer. Partial information is worth reporting; say what the context states.
-4. Reply with exactly this sentence, and nothing else, ONLY when the context says
-   nothing relevant to the question at all:
+1. Use ONLY facts stated in the CONTEXT. Do not infer, extrapolate, or use external knowledge of 3GPP or telecoms.
+2. Cite the source for every claim, using the bracketed tag shown in the context, for example: TS 28.111 §4.1
+3. Provide a thorough, detailed, and well-structured answer:
+   - Explain the core concept, function, or mechanism clearly based on the context.
+   - Break down specific types, attributes, operations, schemas, conditions, and requirements into organized bullet points.
+   - Synthesise all relevant information present in the extracted clauses rather than giving a brief one-line summary.
+4. Reply with exactly this sentence, and nothing else, ONLY when the context has no relevant information at all:
    {refusal}
-5. Do not apologise or explain what you cannot do. Answer, or give the exact
-   refusal sentence.
+5. Do not apologise or add meta-commentary. Answer thoroughly using the context, or give the exact refusal sentence.
 
 CONTEXT:
 {context}
@@ -50,6 +47,23 @@ def answer(question: str, context: str) -> str:
         contents=build_prompt(question, context),
     )
     return (resp.text or REFUSAL).strip()
+
+def answer_stream(question: str, context: str) -> Iterator[str]:
+    """Yield answer text chunks as they are generated."""
+    if not context.strip():
+        yield REFUSAL
+        return
+    try:
+        resp_stream = _client().models.generate_content_stream(
+            model=get_settings().gemini_model,
+            contents=build_prompt(question, context),
+        )
+        for chunk in resp_stream:
+            if chunk.text:
+                yield chunk.text
+    except Exception:
+        # Fallback to non-streaming if stream is unsupported
+        yield answer(question, context)
 
 def rewrite_query(q: str) -> str:
     """Rewrite question as keyword search for a second retrieval pass."""
