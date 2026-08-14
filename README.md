@@ -2,6 +2,10 @@
 
 A retrieval-augmented generation chatbot over 3GPP telecom standards that cites clause-level sources and **refuses to answer** when retrieval confidence is below threshold.
 
+**Live demo:** https://3-gpp-rag.vercel.app · **API health:** [`/api/health`](https://3-gpp-rag.vercel.app/api/health)
+
+Try "What is an alarm notification?" for a cited answer, then "What is the capital of France?" to watch it refuse.
+
 ## Architecture
 
 ```
