@@ -84,9 +84,11 @@ def chat_stream(req: ChatRequest):
         q: queue.Queue = queue.Queue()
         events: list[TraceEvent] = []
 
-        def on_event(ev: TraceEvent):
-            events.append(ev)
-            q.put(("step", asdict(ev)))
+        def on_event(*args):
+            ev = args[-1] if args else None
+            if ev and isinstance(ev, TraceEvent):
+                events.append(ev)
+                q.put(("step", asdict(ev)))
 
         def worker():
             try:
@@ -158,9 +160,23 @@ def chat_stream(req: ChatRequest):
         }
         yield f"data: {json.dumps(meta_payload)}\n\n"
 
+        accumulated_text = ""
         for token in answer_stream(req.question, state["context"]):
             if token:
+                accumulated_text += token
                 yield f"data: {json.dumps({'type': 'delta', 'text': token})}\n\n"
+
+        # If model emitted the refusal string despite non-empty context, emit corrective meta to blank citations
+        if (REFUSAL in accumulated_text) or state.get("refused", False):
+            corrective_meta = {
+                "type": "meta",
+                "action": "incorrect",
+                "refused": True,
+                "citations": [],
+                "sources": [],
+                "trace": [asdict(e) for e in events],
+            }
+            yield f"data: {json.dumps(corrective_meta)}\n\n"
 
         yield f"data: {json.dumps({'type': 'done'})}\n\n"
 

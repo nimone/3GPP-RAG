@@ -273,9 +273,14 @@ export default function App() {
               )
             } else if (parsed.type === "done") {
               // Finalize message
+              const isRefusalText = accumulatedText.includes("Not found in the provided 3GPP specifications")
               const finalMessage = {
                 ...initialBotMessage,
                 ...metaData,
+                refused: isRefusalText || metaData.refused || false,
+                action: isRefusalText ? "incorrect" : (metaData.action || "correct"),
+                citations: isRefusalText ? [] : (metaData.citations || []),
+                sources: isRefusalText ? [] : (metaData.sources || []),
                 content: accumulatedText,
                 isStreaming: false,
               }
@@ -288,7 +293,7 @@ export default function App() {
                         ...c,
                         messages: c.messages.map((m) =>
                           m.id === botMessageId
-                            ? { ...m, isStreaming: false, content: accumulatedText }
+                            ? finalMessage
                             : m
                         ),
                       }
