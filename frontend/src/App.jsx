@@ -285,6 +285,7 @@ export default function App() {
                 isStreaming: false,
               }
               setActiveInspectorMessage(finalMessage)
+              setInspectorOpen(true)
 
               setConversations((prev) =>
                 prev.map((c) =>
@@ -448,7 +449,7 @@ export default function App() {
 
             <div className="flex items-center gap-2">
               <span className="font-semibold text-xs tracking-tight text-foreground">
-                3GPP CRAG Graph
+                3GPP RAG Graph
               </span>
               <Badge variant="outline" className="hidden sm:inline-flex text-[10px] font-mono py-0">
                 Rel-18 Grounded
@@ -476,10 +477,10 @@ export default function App() {
                 size="sm"
                 className="h-7 gap-1.5 text-xs font-medium px-2.5"
                 onClick={() => setInspectorOpen(!inspectorOpen)}
-                aria-label="Toggle CRAG Reasoning Inspector sheet"
+                aria-label="Toggle RAG Reasoning Inspector sheet"
               >
                 <Sliders className="h-3.5 w-3.5" aria-hidden="true" />
-                <span className="hidden sm:inline">CRAG Inspector</span>
+                <span className="hidden sm:inline">RAG Inspector</span>
               </Button>
             )}
           </div>
@@ -536,7 +537,7 @@ export default function App() {
                               3GPP Assistant
                             </span>
                             <Badge variant="outline" className="text-[10px] animate-pulse">
-                              Executing CRAG Graph…
+                              Executing RAG Graph…
                             </Badge>
                           </div>
                           <div className="flex items-center gap-1.5 text-xs text-muted-foreground pt-0.5">

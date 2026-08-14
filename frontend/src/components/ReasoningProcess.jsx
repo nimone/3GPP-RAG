@@ -20,8 +20,13 @@ export default function ReasoningProcess({
   isStreaming,
   currentStep,
   refused,
+  hasContent = false,
 }) {
-  const [isOpen, setIsOpen] = useState(isStreaming)
+  const [userOverride, setUserOverride] = useState(null)
+
+  // Default state: open while performing RAG lookup before content streams; automatically collapse once content starts
+  const autoOpen = isStreaming && !hasContent
+  const isOpen = userOverride !== null ? userOverride : autoOpen
 
   // Step definition mapping
   const stepsList = []
@@ -79,7 +84,7 @@ export default function ReasoningProcess({
   if (rewriteEvt) {
     stepsList.push({
       id: "rewrite",
-      title: "Query Reformulation (CRAG Ambiguity)",
+      title: "Query Reformulation (Ambiguous Context)",
       desc: `Reformulated keyword query for spec alignment: "${rewriteEvt.data.rewritten}"`,
       icon: RefreshCw,
       done: true,
@@ -140,7 +145,7 @@ export default function ReasoningProcess({
       {/* Header Button */}
       <button
         type="button"
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={() => setUserOverride(!isOpen)}
         aria-expanded={isOpen}
         aria-label="Toggle reasoning process"
         className="flex w-full items-center justify-between px-3 py-2 text-left hover:bg-muted/40 transition-colors duration-150 cursor-pointer select-none focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"

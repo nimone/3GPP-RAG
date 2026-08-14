@@ -131,7 +131,7 @@ export default function CitationBadge({
 
         <div className="flex items-center justify-between text-[10px] text-muted-foreground pt-0.5 font-mono tabular-nums">
           <span>Rel-18 Grounding</span>
-          <span>CRAG Verified</span>
+          <span>RAG Verified</span>
         </div>
       </HoverCardContent>
     </HoverCard>

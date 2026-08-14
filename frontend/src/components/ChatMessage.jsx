@@ -27,7 +27,7 @@ const ACTION_CONFIG = {
   ambiguous: {
     label: "Ambiguous (Rewritten)",
     variant: "warning",
-    description: "Initial query was ambiguous; CRAG reformulated search queries to retrieve better context.",
+    description: "Initial query was ambiguous; RAG reformulated search queries to retrieve better context.",
   },
   incorrect: {
     label: "Out of Domain / Refused",
@@ -134,7 +134,7 @@ export default function ChatMessage({
                 size="sm"
                 className="h-7 gap-1.5 px-2.5 text-xs text-foreground font-medium"
                 onClick={() => onOpenInspector(message)}
-                aria-label="Inspect CRAG reasoning graph and confidence scores"
+                aria-label="Inspect RAG reasoning graph and confidence scores"
               >
                 <Sliders className="h-3.5 w-3.5" aria-hidden="true" />
                 <span>Inspect</span>
@@ -166,6 +166,7 @@ export default function ChatMessage({
             isStreaming={isStreaming}
             currentStep={message.currentStep}
             refused={isRefused}
+            hasContent={hasContent}
           />
         )}
 

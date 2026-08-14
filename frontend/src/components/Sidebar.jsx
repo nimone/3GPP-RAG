@@ -123,7 +123,7 @@ export default function Sidebar({
               </div>
               <div className="flex flex-col">
                 <span className="text-xs font-semibold tracking-tight text-foreground">
-                  3GPP CRAG Assistant
+                  3GPP RAG Assistant
                 </span>
                 <span className="text-[10px] text-muted-foreground font-mono">
                   Spec Grounded RAG
@@ -270,7 +270,7 @@ export default function Sidebar({
                 </strong>
               </div>
               <div className="text-right">
-                CRAG: <strong className="text-foreground">Active</strong>
+                RAG: <strong className="text-foreground">Active</strong>
               </div>
             </div>
           </div>

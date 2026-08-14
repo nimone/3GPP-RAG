@@ -118,8 +118,9 @@ export default function ChatInput({
         </div>
       </form>
 
-      <div className="mt-2 text-center text-[11px] text-muted-foreground">
-        Grounded RAG with Corrective RAG (CRAG) graph. Verifies specs before answering.
+      {/* Helper Context Subtitle */}
+      <div className="mt-2 text-center text-[10px] text-muted-foreground/60 font-mono select-none">
+        Grounded 3GPP RAG pipeline. Verifies specification context before answering.
       </div>
     </div>
   )

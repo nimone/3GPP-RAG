@@ -32,7 +32,7 @@ const ACTION_MAP = {
     borderColor: "border-amber-500/30",
     badgeVariant: "warning",
     label: "Query Reformulated (Ambiguous)",
-    desc: "Top retrieval score was ambiguous (0.30 - 0.55). CRAG reformulated query to retrieve better context.",
+    desc: "Top retrieval score was ambiguous (0.30 - 0.55). RAG reformulated query to retrieve better context.",
   },
   incorrect: {
     color: "bg-rose-500",
@@ -64,7 +64,7 @@ export default function InspectorSheet({ activeMessage, onClose }) {
 
   return (
     <aside
-      aria-label="CRAG Reasoning Inspector"
+      aria-label="RAG Reasoning Inspector"
       className="w-full md:w-96 lg:w-[420px] border-l border-border bg-card flex flex-col h-full shadow-elevation-3 z-30 transition-transform duration-200 animate-in slide-in-from-right-4 shrink-0"
     >
       {/* Header */}
@@ -78,7 +78,7 @@ export default function InspectorSheet({ activeMessage, onClose }) {
           </div>
           <div>
             <h3 className="text-xs font-semibold text-foreground tracking-tight">
-              CRAG Reasoning Inspector
+              RAG Reasoning Inspector
             </h3>
             <p className="text-[10px] text-muted-foreground font-mono">
               Graph Evaluation Trace
@@ -341,7 +341,7 @@ export default function InspectorSheet({ activeMessage, onClose }) {
 
                   {evt.step === "action" && (
                     <div className="tabular-nums">
-                      CRAG Action:{" "}
+                      RAG Action:{" "}
                       <strong className="text-foreground uppercase">
                         {evt.data.action}
                       </strong>{" "}

@@ -32,11 +32,11 @@ const FEATURED_PROMPTS = [
     tag: "TS 28.532",
   },
   {
-    title: "Safety & Scope Guardrail",
-    desc: "Verify that the assistant strictly refuses out-of-domain queries to prevent hallucination.",
+    title: "Refusal Guardrail (Out of Domain)",
+    desc: "Test guardrails with non-telecom out-of-domain questions.",
     query: "What is the capital of France?",
     icon: ShieldCheck,
-    tag: "CRAG Guardrail",
+    tag: "RAG Guardrail",
   },
 ]
 
@@ -65,7 +65,7 @@ export default function EmptyState({ onSelectPrompt }) {
       </h1>
 
       <p className="mt-2.5 text-sm text-muted-foreground max-w-lg leading-relaxed">
-        Engineered with <strong>Corrective RAG (CRAG)</strong> graph reasoning.
+        Engineered with <strong>Grounded 3GPP RAG</strong> reasoning.
         Answers are verified against loaded 3GPP specifications (TS&nbsp;28.111, TS&nbsp;28.532, TS&nbsp;28.552) and strictly refused when out of domain.
       </p>
 
