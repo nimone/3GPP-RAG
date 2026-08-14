@@ -2,6 +2,7 @@ import json
 import queue
 import threading
 from dataclasses import asdict
+from pathlib import Path
 from typing import Iterator
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -189,3 +190,11 @@ def chat_stream(req: ChatRequest):
             "X-Accel-Buffering": "no",
         },
     )
+
+# Serve the built SPA as low-priority routes: the API paths above are matched
+# first, anything else falls back to index.html. Vercel deploys a FastAPI app as
+# one function that receives every path, so the frontend has to be served from
+# here rather than from a separate static output directory.
+DIST = Path(__file__).resolve().parents[2] / "frontend" / "dist"
+if DIST.is_dir():
+    app.frontend("/", directory=DIST)

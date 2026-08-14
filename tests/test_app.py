@@ -82,3 +82,16 @@ def test_chat_stream_late_refusal_emits_corrective_meta(client, monkeypatch):
     assert final_meta["citations"] == []
     assert final_meta["sources"] == []
     assert final_meta["action"] == "incorrect"
+
+
+def test_spa_is_served_at_root():
+    """The frontend must not fall through to the API's 404.
+
+    Vercel runs the whole FastAPI app as one function receiving every path, so
+    '/' is only a page if the app serves the build itself.
+    """
+    if not app_module.DIST.is_dir():
+        pytest.skip("frontend/dist not built")
+    r = TestClient(app_module.app).get("/")
+    assert r.status_code == 200
+    assert "text/html" in r.headers["content-type"]
